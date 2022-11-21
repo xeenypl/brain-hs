@@ -21,3 +21,7 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+# date sets are to big for github.
+mnist_test.csv
+mnist_train.csv
