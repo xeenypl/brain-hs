@@ -1,6 +1,7 @@
 module Main where
 
 import MnistDigit
+import System.Random
 
 type Value = Double
 type Weight = Double
@@ -28,6 +29,28 @@ runLayer = map . runNeuron
 
 runModel :: Inputs -> Model -> Outputs
 runModel = foldl runLayer
+
+makeWeigths :: Int -> IO Weights
+makeWeigths n = mapM (const (randomIO :: IO Double)) [1..n]
+
+makeNeuron :: Int -> IO Neuron
+makeNeuron n = do
+    weights <- makeWeigths n
+    bais    <- randomIO
+    pure Neuron 
+        { neuronWeights = weights
+        , neuronBais    = bais
+        }
+
+makeLayer :: Int -> Int -> IO Layer
+makeLayer isz lsz = mapM (const $ makeNeuron isz) [1..lsz]
+
+makeModel :: [Int] -> IO Model
+makeModel [x,y]    = makeLayer x y >>= pure . pure
+makeModel (x:y:xs) = do
+    la <- makeLayer x y
+    rm <- makeModel $ y:xs
+    pure $ la:rm
 
 main :: IO ()
 main = readFile "mnist_test.csv" 
